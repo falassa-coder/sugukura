@@ -347,3 +347,39 @@ img { max-width: 100%; }
 /* Icône avion maison (remplace l'émoji, qui s'affiche en bleu sur certains appareils) */
 .ico-avion { display: inline-block; width: 1.05em; height: 1.05em; vertical-align: -0.16em; fill: currentColor; flex-shrink: 0; }
 .mini-vide .ico-avion { width: 26px; height: 26px; color: var(--mali-vert); }
+
+/* Entête plus présente (menu, logo, bouton) */
+.entete-in { padding: 14px 22px; }
+.logo-s { width: 48px; height: 48px; border-radius: 14px; }
+.logo-nom { font-size: 25px; font-weight: 800; letter-spacing: -.01em; }
+.logo-nom small { font-size: 10.5px; }
+.nav { gap: 6px; }
+.nav-lien { font-size: 16.5px; font-weight: 700; padding: 11px 17px; border-radius: 12px; color: #eadbc8; }
+.nav-gp { color: #fff; }
+.nav .btn-petit { font-size: 16.5px; padding: 12px 20px; border-radius: 13px; }
+.nav-lien .ico-avion { width: 1.1em; height: 1.1em; }
+@media (max-width: 760px) {
+  .entete-in { padding: 11px 14px; }
+  .logo-s { width: 42px; height: 42px; }
+  .logo-nom { font-size: 21px; }
+  .nav-lien { font-size: 15px; padding: 9px 11px; }
+  .nav .btn-petit { font-size: 15px; padding: 10px 14px; }
+}
+@media (max-width: 520px) {
+  .entete-in { padding: 10px 10px; gap: 6px; }
+  .logo-s { width: 40px; height: 40px; }
+  .logo-nom { font-size: 19px; }
+  .logo-nom small { display: none; }
+  .nav { gap: 2px; }
+  .nav-lien { font-size: 14.5px; padding: 8px 8px; }
+  .nav .btn-petit { font-size: 14.5px; padding: 9px 11px; }
+}
+@media (max-width: 380px) { .logo-nom { display: none; } }
+.panneau.collant { top: 100px; }
+@media (max-width: 430px) {
+  .logo { gap: 6px; }
+  .logo-s { width: 36px; height: 36px; border-radius: 11px; }
+  .logo-nom { font-size: 17px; }
+  .nav-lien { font-size: 14px; padding: 8px 6px; }
+  .nav .btn-petit { font-size: 14px; padding: 9px 10px; }
+}
