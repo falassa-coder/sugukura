@@ -26,7 +26,7 @@
       <div class="recherche recherche-gp">
         <div class="sens-filtre" id="filtreSens">
           <button type="button" class="puce-sens actif" data-sens="">Tous les trajets</button>
-          <button type="button" class="puce-sens" data-sens="offre">✈️ Voyageurs (kilos disponibles)</button>
+          <button type="button" class="puce-sens" data-sens="offre"><svg class="ico-avion" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> Voyageurs (kilos disponibles)</button>
           <button type="button" class="puce-sens" data-sens="demande">📦 Demandes d'envoi</button>
         </div>
         <div class="champ"><label for="fDepart">Départ</label><select id="fDepart"><option value="">Toutes villes</option></select></div>
@@ -72,7 +72,7 @@
                 <button class="btn-lien" id="btnAnnulerEdition" type="button">Annuler</button>
               </div>
               <div class="choix-type">
-                <label><input type="radio" name="sens" value="offre" checked /><span>✈️ Je voyage<small>J'ai des kilos disponibles</small></span></label>
+                <label><input type="radio" name="sens" value="offre" checked /><span><svg class="ico-avion" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg> Je voyage<small>J'ai des kilos disponibles</small></span></label>
                 <label><input type="radio" name="sens" value="demande" /><span>📦 Je cherche un GP<small>J'ai un colis à envoyer</small></span></label>
               </div>
               <div class="champ"><label for="gDepart">Ville de départ</label><select id="gDepart" required></select></div>
@@ -105,7 +105,7 @@
   <div id="pied"></div>
 
   <script type="module">
-    import { auth, db, VILLES_GP, QUOTA_GP, esc, chiffres, aujourdhui, dateFr, prixKg, estEntreprise, renderEntete, renderPied } from "./commun.js";
+    import { auth, db, AVION, VILLES_GP, QUOTA_GP, esc, chiffres, aujourdhui, dateFr, prixKg, estEntreprise, renderEntete, renderPied } from "./commun.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
     import { collection, query, where, orderBy, limit, onSnapshot, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
@@ -168,7 +168,7 @@
             <div>
               <div class="trajet-route">${route(t)}</div>
               <div class="trajet-infos">
-                <span class="puce-gp ${t.sens === "demande" ? "puce-demande" : "puce-offre"}">${t.sens === "demande" ? "📦 Cherche un GP" : "✈️ Voyageur"}</span>
+                <span class="puce-gp ${t.sens === "demande" ? "puce-demande" : "puce-offre"}">${t.sens === "demande" ? "📦 Cherche un GP" : AVION + " Voyageur"}</span>
                 ${libelleKilos(t) ? `<span class="puce-gp">${esc(libelleKilos(t))}</span>` : ""}
                 <span class="puce-gp">${esc(prixKg(t))}</span>
                 ${estEntreprise(t.plan) ? `<span class="puce-gp" style="background:linear-gradient(135deg,#f5cf7c,var(--ocre));color:var(--brun);">★ Pro</span>` : ""}
@@ -254,7 +254,7 @@
       if (mesTrajets.length === 0) { zone.innerHTML = `<div class="petit">Aucun trajet publié pour le moment.</div>`; return; }
       zone.innerHTML = mesTrajets.map((t) => `
         <div class="mon-annonce" style="${aVenir(t) ? "" : "opacity:.6;"}">
-          <div class="mini-vide" style="background: var(--mali-vert-pale);">${t.sens === "demande" ? "📦" : "✈️"}</div>
+          <div class="mini-vide" style="background: var(--mali-vert-pale);">${t.sens === "demande" ? "📦" : AVION}</div>
           <div class="corps">
             <strong>${esc(t.depart)} → ${esc(t.arrivee)}</strong>
             <span>${esc(dateFr(t.dateVoyage))} · ${esc(libelleKilos(t))}${aVenir(t) ? "" : " · terminé (masqué)"}</span>

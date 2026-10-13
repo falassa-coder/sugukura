@@ -21,7 +21,7 @@
   <div id="pied"></div>
 
   <script type="module">
-    import { auth, db, esc, chiffres, dateFr, prixKg, estEntreprise, aujourdhui, renderEntete, renderPied } from "./commun.js";
+    import { auth, db, AVION, esc, chiffres, dateFr, prixKg, estEntreprise, aujourdhui, renderEntete, renderPied } from "./commun.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
@@ -52,7 +52,7 @@
         zone.className = "";
         zone.innerHTML = `
           <div class="panneau">
-            <span class="badge ${offre ? "badge-offre" : "badge-demande"}">${offre ? "✈️ Voyageur — kilos disponibles" : "📦 Recherche un GP"}</span>
+            <span class="badge ${offre ? "badge-offre" : "badge-demande"}">${offre ? AVION + " Voyageur — kilos disponibles" : "📦 Recherche un GP"}</span>
             <div class="route-detail">${esc(t.depart)} <span class="fl">→</span> ${esc(t.arrivee)}</div>
             <div class="meta">${esc(dateFr(t.dateVoyage))}</div>
             ${passe ? `<div class="message info">Ce trajet est passé : il n'apparaît plus dans la liste.</div>` : ""}

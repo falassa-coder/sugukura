@@ -2,6 +2,10 @@
    SUGUKURA — feuille de style partagée
    Identité : brun profond, terre cuite, ocre, sable (inspiration bogolan)
    ============================================================ */
+/* Police des titres (Fraunces, hébergée avec le site — licence libre OFL) */
+@font-face { font-family: "Fraunces"; src: url("fonts/fraunces.woff2") format("woff2"); font-weight: 300 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url("fonts/fraunces-italic.woff2") format("woff2"); font-weight: 300 900; font-style: italic; font-display: swap; }
+
 :root {
   --brun: #2a1b12;
   --brun-2: #432b19;
@@ -16,7 +20,7 @@
   --doux: #7a6a5a;
   --vert: #1f8a4c;
   --rayon: 18px;
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
   --ombre: 0 1px 2px rgba(42,27,18,.05), 0 6px 20px rgba(42,27,18,.07);
   --ombre-forte: 0 14px 40px rgba(42,27,18,.18);
 }
@@ -64,11 +68,11 @@ img { max-width: 100%; }
   background-size: 24px 24px, auto, auto; }
 .hero::after { content: ""; position: absolute; width: 440px; height: 440px; right: -130px; top: -170px; border-radius: 50%; background: radial-gradient(circle, rgba(232,121,63,.35), transparent 68%); pointer-events: none; }
 .hero-in { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; }
-.etiquette-or { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ocre); }
+.etiquette-or { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ocre); }
 .etiquette-or::before { content: ""; width: 28px; height: 1.5px; background: var(--ocre); }
-.hero h1 { font-family: var(--serif); margin: 14px 0 12px; font-size: clamp(30px, 6vw, 50px); line-height: 1.1; font-weight: 700; letter-spacing: -.01em; max-width: 700px; }
+.hero h1 { font-family: var(--serif); margin: 16px 0 16px; font-size: clamp(38px, 7.4vw, 72px); line-height: 1.02; font-weight: 800; letter-spacing: -.025em; max-width: 860px; font-variation-settings: "opsz" 144; }
 .hero h1 em { font-style: italic; color: var(--terre-clair); }
-.hero p { margin: 0; max-width: 540px; color: #dcc9b2; font-size: 15.5px; }
+.hero p { margin: 0; max-width: 600px; color: #e6d6c2; font-size: clamp(15.5px, 1.6vw, 18px); line-height: 1.55; }
 
 .page { padding: 0 18px 20px; }
 .conteneur { max-width: 1120px; margin: 0 auto; }
@@ -99,7 +103,7 @@ img { max-width: 100%; }
 .tuile.actif .nb { color: var(--ocre); }
 
 .titre-section { margin: 34px 0 16px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.titre-section h2 { font-family: var(--serif); font-size: 26px; margin: 0; color: var(--brun); }
+.titre-section h2 { font-family: var(--serif); font-size: clamp(26px, 3.4vw, 34px); font-weight: 800; letter-spacing: -.015em; margin: 0; color: var(--brun); }
 .titre-section h2::after { content: ""; display: block; width: 52px; height: 3px; margin-top: 9px; background: var(--terre); border-radius: 3px; }
 
 /* ---------- Cartes d'annonces ---------- */
@@ -137,7 +141,7 @@ img { max-width: 100%; }
 .atout p { margin: 0; font-size: 13.5px; color: var(--doux); }
 
 .appel { margin-top: 36px; position: relative; overflow: hidden; border-radius: 22px; background: linear-gradient(135deg, var(--terre-fonce), var(--terre)); color: #fff; padding: 36px 26px; text-align: center; }
-.appel h2 { font-family: var(--serif); margin: 0 0 8px; font-size: 26px; }
+.appel h2 { font-family: var(--serif); margin: 0 0 8px; font-size: clamp(26px, 3.6vw, 36px); font-weight: 800; letter-spacing: -.015em; }
 .appel p { margin: 0 auto 20px; max-width: 460px; color: #ffe3d2; font-size: 14.5px; }
 .appel .btn { background: #fff; color: var(--terre-fonce); }
 
@@ -159,7 +163,7 @@ img { max-width: 100%; }
 .miniature.actif { border-color: var(--terre); opacity: 1; }
 
 .panneau { background: #fff; border: 1px solid var(--bordure); border-radius: 22px; padding: 26px; box-shadow: var(--ombre); }
-.panneau h1 { font-family: var(--serif); font-size: 28px; line-height: 1.15; margin: 8px 0 0; color: var(--brun); }
+.panneau h1 { font-family: var(--serif); font-size: clamp(26px, 3vw, 34px); font-weight: 800; letter-spacing: -.015em; line-height: 1.12; margin: 8px 0 0; color: var(--brun); }
 .prix-detail { font-size: 28px; font-weight: 800; color: var(--terre-fonce); margin: 10px 0 6px; letter-spacing: -.01em; }
 .meta { font-size: 13px; color: var(--doux); margin-bottom: 16px; }
 .titre-mini { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--terre-fonce); margin: 20px 0 8px; }
@@ -185,7 +189,7 @@ img { max-width: 100%; }
 
 /* ---------- Compte / formulaires ---------- */
 .boite { background: #fff; border: 1px solid var(--bordure); border-radius: 22px; padding: 26px; box-shadow: var(--ombre); margin-bottom: 20px; }
-.boite h2 { font-family: var(--serif); font-size: 23px; margin: 0 0 4px; color: var(--brun); }
+.boite h2 { font-family: var(--serif); font-size: 25px; font-weight: 800; letter-spacing: -.01em; margin: 0 0 4px; color: var(--brun); }
 .boite h2::after { content: ""; display: block; width: 46px; height: 3px; margin: 10px 0 16px; background: var(--terre); border-radius: 3px; }
 .onglets { display: flex; gap: 6px; background: var(--sable-2); padding: 5px; border-radius: 13px; margin-bottom: 18px; }
 .onglet { flex: 1; border: none; background: none; padding: 10px; border-radius: 9px; font-family: inherit; font-weight: 700; font-size: 14px; color: var(--doux); cursor: pointer; }
@@ -276,9 +280,9 @@ img { max-width: 100%; }
 .hero-gp .hero-in { position: relative; z-index: 1; }
 .hero-gp .etiquette-or { color: var(--mali-jaune); }
 .hero-gp .etiquette-or::before { background: var(--mali-jaune); }
-.hero-gp h1 { font-family: var(--serif); margin: 12px 0 10px; font-size: clamp(28px, 5.5vw, 46px); line-height: 1.1; max-width: 720px; }
+.hero-gp h1 { font-family: var(--serif); margin: 16px 0 16px; font-size: clamp(36px, 7vw, 68px); line-height: 1.02; font-weight: 800; letter-spacing: -.025em; max-width: 900px; font-variation-settings: "opsz" 144; }
 .hero-gp h1 em { font-style: normal; color: var(--mali-jaune); }
-.hero-gp p { margin: 0; max-width: 560px; color: #d6eedd; font-size: 15px; }
+.hero-gp p { margin: 0; max-width: 600px; color: #dcf0e2; font-size: clamp(15.5px, 1.6vw, 18px); line-height: 1.55; }
 
 .recherche-gp::before { background: linear-gradient(90deg, var(--mali-vert), var(--mali-jaune)); }
 .sens-filtre { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
@@ -312,7 +316,7 @@ img { max-width: 100%; }
 .avertissement-gp strong { display: block; margin-bottom: 4px; color: #4a3a00; }
 .avertissement-gp ul { margin: 6px 0 0; padding-left: 18px; }
 
-.route-detail { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--brun); line-height: 1.15; margin: 10px 0 4px; }
+.route-detail { font-family: var(--serif); font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -.02em; color: var(--brun); line-height: 1.15; margin: 10px 0 4px; }
 .route-detail .fl { color: var(--mali-vert); }
 .badge-offre { color: #fff; background: var(--mali-vert); }
 .badge-demande { color: #4a3a00; background: var(--mali-jaune); }
@@ -322,7 +326,7 @@ img { max-width: 100%; }
   background: linear-gradient(135deg, var(--mali-vert-fonce), var(--mali-vert)); box-shadow: var(--ombre-forte); }
 .encart-gp::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: var(--mali-jaune); }
 .encart-gp .eti { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--mali-jaune); }
-.encart-gp h2 { font-family: var(--serif); font-size: 25px; margin: 6px 0; }
+.encart-gp h2 { font-family: var(--serif); font-size: clamp(24px, 3.2vw, 32px); font-weight: 800; letter-spacing: -.015em; margin: 6px 0; }
 .encart-gp p { margin: 0; color: #d6eedd; font-size: 14px; max-width: 520px; }
 .encart-gp .btn { background: var(--mali-jaune); color: #2b2300; justify-self: start; }
 @media (min-width: 760px) { .encart-gp { grid-template-columns: 1fr auto; padding: 30px 34px; } }
@@ -339,3 +343,7 @@ img { max-width: 100%; }
   .nav .btn-petit { padding: 8px 10px; font-size: 13px; }
 }
 @media (max-width: 380px) { .logo-nom { display: none; } }
+
+/* Icône avion maison (remplace l'émoji, qui s'affiche en bleu sur certains appareils) */
+.ico-avion { display: inline-block; width: 1.05em; height: 1.05em; vertical-align: -0.16em; fill: currentColor; flex-shrink: 0; }
+.mini-vide .ico-avion { width: 26px; height: 26px; color: var(--mali-vert); }

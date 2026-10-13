@@ -104,6 +104,9 @@ export function categorieDe(annonce) {
   return annonce && annonce.categorie === "motos" ? "vehicules" : annonce?.categorie;
 }
 
+// Icône avion (remplace l'émoji ✈️, affiché en bleu sur certains téléphones)
+export const AVION = `<svg class="ico-avion" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>`;
+
 // Logo : une personne chargée de ses courses
 export const LOGO_SVG = `<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#c8501f"/><circle cx="19.5" cy="6.6" r="2.6" fill="#e0a43a"/><circle cx="24.5" cy="5.4" r="2.8" fill="#7bbf4e"/><circle cx="29.2" cy="6.8" r="2.4" fill="#e0a43a"/><path d="M15.5 8.6h17l-2 4.8h-13z" fill="#fff"/><path d="M18 10.6h12" stroke="#c8501f" stroke-width=".9"/><circle cx="24" cy="17.6" r="3.6" fill="#fff"/><path d="M20.2 23.4 L16.6 17.2 L17.2 12.6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M27.8 23.4 L32 29.6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M20 22.2h8l4.2 15.4H15.8z" fill="#fff"/><path d="M17.6 31.2h12.8" stroke="#e0a43a" stroke-width="1.6"/><path d="M21.4 37.6v4.8M26.6 37.6v4.8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M30.2 31.4h8.6l-.8 9.8h-7z" fill="#e0a43a"/><path d="M32 31.6c0-3 5-3 5 0" fill="none" stroke="#e0a43a" stroke-width="1.5"/><circle cx="33" cy="30" r="1.6" fill="#7bbf4e"/></svg>`;
 
@@ -176,7 +179,7 @@ export function renderEntete(actif) {
         </a>
         <nav class="nav">
           <a class="nav-lien cache-mobile ${actif === "annonces" ? "actif" : ""}" href="index.html">Annonces</a>
-          <a class="nav-lien nav-gp ${actif === "gp" ? "actif" : ""}" href="gp.html">✈️ GP</a>
+          <a class="nav-lien nav-gp ${actif === "gp" ? "actif" : ""}" href="gp.html">${AVION} GP</a>
           <a class="nav-lien ${actif === "compte" ? "actif" : ""}" id="lienCompte" href="publier.html">Connexion</a>
           <a class="btn btn-terre btn-petit" href="publier.html#publier">+ Déposer</a>
         </nav>
@@ -213,6 +216,6 @@ export function renderPied() {
           <a href="mailto:${CONTACT_EMAIL}">✉️ ${CONTACT_EMAIL}</a>
         </div>
       </div>
-      <div class="pied-bas">© Sugukura — prototype</div>
+      <div class="pied-bas">© 2026 Sugukura — MFS Services et Conseils</div>
     </footer>`;
 }
