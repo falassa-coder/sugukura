@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <rect width="48" height="48" rx="13" fill="#c8501f"/>
+  <!-- produits dans le panier -->
+  <circle cx="19.5" cy="6.6" r="2.6" fill="#e0a43a"/>
+  <circle cx="24.5" cy="5.4" r="2.8" fill="#7bbf4e"/>
+  <circle cx="29.2" cy="6.8" r="2.4" fill="#e0a43a"/>
+  <!-- panier porté sur la tête -->
+  <path d="M15.5 8.6h17l-2 4.8h-13z" fill="#fff"/>
+  <path d="M18 10.6h12" stroke="#c8501f" stroke-width=".9"/>
+  <!-- tête -->
+  <circle cx="24" cy="17.6" r="3.6" fill="#fff"/>
+  <!-- bras levé qui tient le panier -->
+  <path d="M20.2 23.4 L16.6 17.2 L17.2 12.6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- bras qui porte le sac -->
+  <path d="M27.8 23.4 L32 29.6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- robe -->
+  <path d="M20 22.2h8l4.2 15.4H15.8z" fill="#fff"/>
+  <path d="M17.6 31.2h12.8" stroke="#e0a43a" stroke-width="1.6"/>
+  <!-- jambes -->
+  <path d="M21.4 37.6v4.8M26.6 37.6v4.8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- sac de courses -->
+  <path d="M30.2 31.4h8.6l-.8 9.8h-7z" fill="#e0a43a"/>
+  <path d="M32 31.6c0-3 5-3 5 0" fill="none" stroke="#e0a43a" stroke-width="1.5"/>
+  <circle cx="33" cy="30" r="1.6" fill="#7bbf4e"/>
+</svg>

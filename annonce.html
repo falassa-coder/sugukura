@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Annonce — Sugukura</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="entete"></div>
+
+  <main class="page" style="padding-top: 1px;">
+    <div class="conteneur">
+      <a class="retour" href="index.html">← Retour aux annonces</a>
+      <div id="zone" class="chargement">Chargement de l'annonce…</div>
+    </div>
+  </main>
+
+  <div id="pied"></div>
+
+  <script type="module">
+    import { auth, db, CATEGORIES, esc, chiffres, formatPrix, ilYa, estEntreprise, lignesFiche, categorieDe, renderEntete, renderPied } from "./commun.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+    renderEntete("annonces");
+    renderPied();
+
+    const zone = document.getElementById("zone");
+    const id = new URLSearchParams(window.location.search).get("id");
+
+    let photos = [];
+    let courante = 0;
+
+    function afficherPhoto() {
+      const img = document.getElementById("photoPrincipale");
+      const cpt = document.getElementById("compteurPhoto");
+      if (!img || photos.length === 0) return;
+      img.src = photos[courante];
+      if (cpt) cpt.textContent = `${courante + 1} / ${photos.length}`;
+      document.querySelectorAll(".miniature").forEach((m, i) => m.classList.toggle("actif", i === courante));
+    }
+    function aller(i) {
+      courante = (i + photos.length) % photos.length;
+      afficherPhoto();
+    }
+
+    async function charger() {
+      if (!id) { zone.className = "vide"; zone.textContent = "Annonce introuvable."; return; }
+      try {
+        const snap = await getDoc(doc(db, "annonces", id));
+        if (!snap.exists()) { zone.className = "vide"; zone.textContent = "Cette annonce n'est plus disponible."; return; }
+        const a = snap.data();
+        const c = CATEGORIES[categorieDe(a)] || { nom: "Autre", icone: "📦" };
+        photos = Array.isArray(a.photoUrls) ? a.photoUrls : [];
+        document.title = `${a.titre} — Sugukura`;
+
+        const plusieurs = photos.length > 1;
+        const diapo = photos[0]
+          ? `<img id="photoPrincipale" src="${esc(photos[0])}" alt="${esc(a.titre)}" />`
+          : `<div class="photo-vide">${c.icone}</div>`;
+        const fleches = plusieurs
+          ? `<button class="fleche prec" id="btnPrec" aria-label="Photo précédente">‹</button>
+             <button class="fleche suiv" id="btnSuiv" aria-label="Photo suivante">›</button>
+             <span class="compteur-photo" id="compteurPhoto"></span>` : "";
+        const miniatures = plusieurs
+          ? `<div class="miniatures">${photos.map((u, i) => `<button class="miniature" data-i="${i}"><img src="${esc(u)}" alt="Photo ${i + 1}" loading="lazy" /></button>`).join("")}</div>` : "";
+
+        const lignes = lignesFiche(a);
+        const fiche = lignes.length
+          ? `<div class="titre-mini">Caractéristiques</div>
+             <div class="fiche">${lignes.map(([l, v]) => `<div class="ligne-fiche"><span class="l">${esc(l)}</span><span class="v">${esc(v)}</span></div>`).join("")}</div>` : "";
+
+        const ent = estEntreprise(a.plan);
+
+        zone.className = "";
+        zone.innerHTML = `
+          <div class="detail">
+            <div class="galerie">
+              <div class="diapo">${diapo}${fleches}</div>
+              ${miniatures}
+            </div>
+            <div class="panneau collant">
+              <span class="badge badge-cat">${c.icone} ${esc(c.nom)}</span>
+              <h1>${esc(a.titre)}</h1>
+              <div class="prix-detail">${esc(formatPrix(a.prix))}</div>
+              <div class="meta">📍 ${esc(a.ville)} · ${esc(ilYa(a.creeLe))}</div>
+              ${fiche}
+              <div class="titre-mini">Description</div>
+              <p class="description">${esc(a.description || "Aucune description.")}</p>
+              <div class="vendeur">
+                <div class="avatar">${esc((a.nomVendeur || "?").trim().charAt(0).toUpperCase())}</div>
+                <div>
+                  <strong>${esc(a.nomVendeur || "Vendeur")}</strong>
+                  <span>${ent ? '<span class="badge badge-ent">★ Compte Pro</span>' : "Particulier"}</span>
+                </div>
+              </div>
+              <div class="actions">
+                <div id="zoneContact" class="actions"><div class="petit">Chargement du contact…</div></div>
+                <button class="btn btn-contour btn-plein" id="btnPartager" type="button">🔗 Partager l'annonce</button>
+              </div>
+            </div>
+          </div>`;
+
+        afficherPhoto();
+        surveillerContact(a);
+        const prec = document.getElementById("btnPrec");
+        const suiv = document.getElementById("btnSuiv");
+        if (prec) prec.addEventListener("click", () => aller(courante - 1));
+        if (suiv) suiv.addEventListener("click", () => aller(courante + 1));
+        document.querySelectorAll(".miniature").forEach((m) => m.addEventListener("click", () => aller(Number(m.dataset.i))));
+
+        document.getElementById("btnPartager").addEventListener("click", async (e) => {
+          const bouton = e.currentTarget;
+          try {
+            if (navigator.share) {
+              await navigator.share({ title: a.titre, text: `${a.titre} — ${formatPrix(a.prix)} sur Sugukura`, url: window.location.href });
+            } else {
+              await navigator.clipboard.writeText(window.location.href);
+              bouton.textContent = "✓ Lien copié";
+              setTimeout(() => (bouton.textContent = "🔗 Partager l'annonce"), 2000);
+            }
+          } catch (_) { /* partage annulé */ }
+        });
+      } catch (erreur) {
+        zone.className = "vide";
+        zone.innerHTML = `Erreur de chargement.<br><small>${esc(erreur.message)}</small>`;
+      }
+    }
+    // ---------- Contact du vendeur : réservé aux membres connectés ----------
+    function surveillerContact(a) {
+      onAuthStateChanged(auth, async (utilisateur) => {
+        const zoneContact = document.getElementById("zoneContact");
+        if (!zoneContact) return;
+        if (!utilisateur) {
+          const retour = encodeURIComponent("annonce.html" + window.location.search);
+          zoneContact.innerHTML = `
+            <div class="contact-masque">
+              <strong>🔒 Contact du vendeur</strong>
+              <p>Connectez-vous ou créez un compte gratuit pour voir le WhatsApp et le numéro du vendeur.</p>
+              <a class="btn btn-terre btn-plein" href="publier.html?retour=${retour}">Se connecter pour contacter</a>
+            </div>`;
+          return;
+        }
+        let wa = "", tel = "";
+        try {
+          const snap = await getDoc(doc(db, "contacts", id));
+          if (snap.exists()) {
+            wa = chiffres(snap.data().whatsapp);
+            tel = chiffres(snap.data().telephone);
+          }
+        } catch (_) { /* contact illisible : on tente l'ancien format */ }
+        if (!wa && !tel) tel = wa = chiffres(a.telephone); // anciennes annonces
+        const msg = encodeURIComponent(`Bonjour, je suis intéressé(e) par votre annonce « ${a.titre} » sur Sugukura : ${window.location.href}`);
+        const boutons = [];
+        if (wa) boutons.push(`<a class="btn btn-wa btn-plein" target="_blank" rel="noopener" href="https://wa.me/${wa}?text=${msg}">💬 Contacter sur WhatsApp</a>`);
+        if (tel) boutons.push(`<a class="btn btn-contour btn-plein" href="tel:+${tel}">📞 Appeler</a>`);
+        zoneContact.innerHTML = boutons.length
+          ? boutons.join("")
+          : `<div class="message info">Le vendeur n'a pas renseigné de numéro.</div>`;
+      });
+    }
+
+    charger();
+  </script>
+</body>
+</html>

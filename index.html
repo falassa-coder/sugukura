@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sugukura — Petites annonces au Mali</title>
+<meta name="description" content="Sugukura, le nouveau marché du Mali : autos, motos, immobilier, électronique et services entre particuliers et pros." />
+<link rel="icon" href="logo.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="entete"></div>
+
+  <section class="hero">
+    <div class="hero-in">
+      <span class="etiquette-or">Petites annonces · Mali</span>
+      <h1>Achetez, vendez, trouvez : <em>le nouveau marché</em> du Mali</h1>
+      <p>Autos, motos, immobilier, électronique et services. Des particuliers et des pros, partout au Mali, réunis au même endroit.</p>
+    </div>
+  </section>
+
+  <main class="page">
+    <div class="conteneur">
+
+      <div class="recherche">
+        <div class="champ col-2">
+          <label for="fQ">Que cherchez-vous ?</label>
+          <input id="fQ" type="search" placeholder="Ex. Toyota Corolla, maison à louer, plombier…" />
+        </div>
+        <div class="champ">
+          <label for="fVille">Ville</label>
+          <select id="fVille"><option value="">Tout le Mali</option></select>
+        </div>
+        <div class="champ">
+          <label for="fCat">Catégorie</label>
+          <select id="fCat"><option value="">Toutes</option></select>
+        </div>
+        <div class="champ">
+          <label for="fPrixMin">Prix min (FCFA)</label>
+          <input id="fPrixMin" type="number" inputmode="numeric" placeholder="0" />
+        </div>
+        <div class="champ">
+          <label for="fPrixMax">Prix max (FCFA)</label>
+          <input id="fPrixMax" type="number" inputmode="numeric" placeholder="Illimité" />
+        </div>
+        <div class="pied-recherche">
+          <span class="compteur" id="compteur"></span>
+          <button class="btn-lien" id="btnReset" type="button">Réinitialiser</button>
+        </div>
+      </div>
+
+      <div class="tuiles" id="tuiles"></div>
+
+      <div class="titre-section"><h2 id="titreListe">Dernières annonces</h2></div>
+      <div id="zone" class="chargement">Chargement des annonces…</div>
+
+      <div class="pub">
+        <strong>Votre publicité ici</strong>
+        <span>Touchez des milliers d'acheteurs au Mali. <a id="lienPub" href="#" target="_blank" rel="noopener">Demander les tarifs →</a></span>
+      </div>
+
+      <section class="atouts">
+        <div class="atout"><div class="ico">🆓</div><div><h3>Gratuit pour les particuliers</h3><p>Déposez vos annonces sans frais, avec photos, en quelques minutes.</p></div></div>
+        <div class="atout"><div class="ico">🏢</div><div><h3>Comptes Pros</h3><p>Garages, agences, boutiques : plus d'annonces et plus de visibilité, avec un abonnement annuel.</p></div></div>
+        <div class="atout"><div class="ico">💬</div><div><h3>Contact direct</h3><p>Une fois connecté, échangez directement avec le vendeur par WhatsApp ou par appel.</p></div></div>
+      </section>
+
+      <section class="appel">
+        <h2>Vous avez quelque chose à vendre ?</h2>
+        <p>Créez votre compte et publiez votre première annonce en moins de cinq minutes.</p>
+        <a class="btn" href="publier.html#publier">+ Déposer une annonce</a>
+      </section>
+
+    </div>
+  </main>
+
+  <div id="pied"></div>
+
+  <script type="module">
+    import { db, CATEGORIES, VILLES, CONTACT_WHATSAPP, esc, formatPrix, ilYa, estEntreprise, lignesFiche, categorieDe, renderEntete, renderPied } from "./commun.js";
+    import { collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+    renderEntete("annonces");
+    renderPied();
+    document.getElementById("lienPub").href =
+      `https://wa.me/${CONTACT_WHATSAPP}?text=${encodeURIComponent("Bonjour, je souhaite les tarifs publicitaires de Sugukura.")}`;
+
+    const zone = document.getElementById("zone");
+    const compteur = document.getElementById("compteur");
+    const titreListe = document.getElementById("titreListe");
+    const fQ = document.getElementById("fQ");
+    const fVille = document.getElementById("fVille");
+    const fCat = document.getElementById("fCat");
+    const fPrixMin = document.getElementById("fPrixMin");
+    const fPrixMax = document.getElementById("fPrixMax");
+    const tuiles = document.getElementById("tuiles");
+
+    fVille.innerHTML += VILLES.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+    fCat.innerHTML += Object.entries(CATEGORIES).map(([id, c]) => `<option value="${id}">${c.icone} ${esc(c.nom)}</option>`).join("");
+
+    let annonces = [];
+
+    const normaliser = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+    function dessinerTuiles() {
+      tuiles.innerHTML = Object.entries(CATEGORIES).map(([id, c]) => {
+        const nb = annonces.filter((a) => categorieDe(a) === id).length;
+        return `<button type="button" class="tuile ${fCat.value === id ? "actif" : ""}" data-cat="${id}">
+          <span class="ico">${c.icone}</span><span class="nom">${esc(c.nom)}</span>
+          <span class="nb">${nb} annonce${nb > 1 ? "s" : ""}</span></button>`;
+      }).join("");
+      tuiles.querySelectorAll(".tuile").forEach((t) => t.addEventListener("click", () => {
+        fCat.value = fCat.value === t.dataset.cat ? "" : t.dataset.cat;
+        afficher();
+      }));
+    }
+
+    function afficher() {
+      const q = normaliser(fQ.value.trim());
+      const ville = fVille.value;
+      const cat = fCat.value;
+      const min = fPrixMin.value ? Number(fPrixMin.value) : null;
+      const max = fPrixMax.value ? Number(fPrixMax.value) : null;
+
+      const resultats = annonces.filter((a) => {
+        if (cat && categorieDe(a) !== cat) return false;
+        if (ville && a.ville !== ville) return false;
+        if (min !== null && !(a.prix >= min)) return false;
+        if (max !== null && !(a.prix <= max)) return false;
+        if (q && !normaliser(a.titre + " " + a.description).includes(q)) return false;
+        return true;
+      });
+
+      compteur.textContent = `${resultats.length} annonce${resultats.length > 1 ? "s" : ""}`;
+      titreListe.textContent = cat ? `${CATEGORIES[cat].icone} ${CATEGORIES[cat].nom}` : "Dernières annonces";
+      dessinerTuiles();
+
+      if (resultats.length === 0) {
+        zone.className = "vide";
+        zone.innerHTML = annonces.length === 0
+          ? `Aucune annonce pour le moment.<br><br><a class="btn btn-terre" href="publier.html#publier">Publier la première annonce</a>`
+          : `Aucune annonce ne correspond à votre recherche.<br>Essayez d'élargir les critères.`;
+        return;
+      }
+
+      zone.className = "grille";
+      zone.innerHTML = resultats.map((a) => {
+        const c = CATEGORIES[categorieDe(a)] || { nom: "Autre", icone: "📦" };
+        const photo = (a.photoUrls || [])[0]
+          ? `<img src="${esc(a.photoUrls[0])}" alt="${esc(a.titre)}" loading="lazy" />`
+          : `<div class="photo-vide">${c.icone}</div>`;
+        const ent = estEntreprise(a.plan) ? `<span class="puce-coin puce-ent">★ Pro</span>` : "";
+        const puces = lignesFiche(a).slice(0, 3).map(([, v]) => `<span class="puce">${esc(v)}</span>`).join("");
+        return `
+          <a class="carte" href="annonce.html?id=${encodeURIComponent(a.id)}">
+            <div class="carte-photo">${photo}<span class="puce-coin puce-cat">${c.icone} ${esc(c.nom)}</span>${ent}</div>
+            <div class="carte-corps">
+              <div class="carte-prix">${esc(formatPrix(a.prix))}</div>
+              <div class="carte-titre">${esc(a.titre)}</div>
+              <div class="puces">${puces}</div>
+              <div class="carte-pied"><span>📍 ${esc(a.ville)}</span><span>${esc(ilYa(a.creeLe))}</span></div>
+            </div>
+          </a>`;
+      }).join("");
+    }
+
+    [fQ, fVille, fCat, fPrixMin, fPrixMax].forEach((c) => {
+      c.addEventListener("input", afficher);
+      c.addEventListener("change", afficher);
+    });
+    document.getElementById("btnReset").addEventListener("click", () => {
+      fQ.value = ""; fVille.value = ""; fCat.value = ""; fPrixMin.value = ""; fPrixMax.value = "";
+      afficher();
+    });
+
+    onSnapshot(
+      query(collection(db, "annonces"), orderBy("creeLe", "desc"), limit(120)),
+      (snapshot) => {
+        annonces = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        afficher();
+      },
+      (erreur) => {
+        zone.className = "vide";
+        zone.innerHTML = `Impossible de charger les annonces.<br><small>${esc(erreur.message)}</small>`;
+      }
+    );
+  </script>
+</body>
+</html>
