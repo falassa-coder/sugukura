@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trajet GP — Sugukura</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="entete"></div>
+  <div class="filet-mali"></div>
+
+  <main class="page" style="padding-top: 1px;">
+    <div class="conteneur-etroit">
+      <a class="retour" href="gp.html" style="color: var(--mali-vert-fonce);">← Retour aux trajets GP</a>
+      <div id="zone" class="chargement">Chargement du trajet…</div>
+    </div>
+  </main>
+
+  <div id="pied"></div>
+
+  <script type="module">
+    import { auth, db, esc, chiffres, dateFr, prixKg, estEntreprise, aujourdhui, renderEntete, renderPied } from "./commun.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+    renderEntete("gp");
+    renderPied();
+
+    const zone = document.getElementById("zone");
+    const id = new URLSearchParams(location.search).get("id");
+
+    async function charger() {
+      if (!id) { zone.className = "vide"; zone.textContent = "Trajet introuvable."; return; }
+      try {
+        const snap = await getDoc(doc(db, "gp", id));
+        if (!snap.exists()) { zone.className = "vide"; zone.textContent = "Ce trajet n'est plus disponible."; return; }
+        const t = snap.data();
+        const offre = t.sens !== "demande";
+        const passe = t.dateVoyage < aujourdhui();
+        document.title = `${t.depart} → ${t.arrivee} le ${dateFr(t.dateVoyage)} — Sugukura GP`;
+
+        const lignes = [
+          [offre ? "Date du voyage" : "Date souhaitée", dateFr(t.dateVoyage)],
+          offre && t.dateLimite ? ["Dépôt des colis jusqu'au", dateFr(t.dateLimite)] : null,
+          [offre ? "Kilos disponibles" : "Poids du colis", t.kilos ? Number(t.kilos).toLocaleString("fr-FR") + " kg" : "—"],
+          [offre ? "Prix" : "Budget", prixKg(t)],
+          t.lieu ? ["Dépôt / retrait", t.lieu] : null,
+        ].filter(Boolean);
+
+        zone.className = "";
+        zone.innerHTML = `
+          <div class="panneau">
+            <span class="badge ${offre ? "badge-offre" : "badge-demande"}">${offre ? "✈️ Voyageur — kilos disponibles" : "📦 Recherche un GP"}</span>
+            <div class="route-detail">${esc(t.depart)} <span class="fl">→</span> ${esc(t.arrivee)}</div>
+            <div class="meta">${esc(dateFr(t.dateVoyage))}</div>
+            ${passe ? `<div class="message info">Ce trajet est passé : il n'apparaît plus dans la liste.</div>` : ""}
+            <div class="titre-mini" style="color: var(--mali-vert-fonce);">Détails</div>
+            <div class="fiche">${lignes.map(([l, v]) => `<div class="ligne-fiche"><span class="l">${esc(l)}</span><span class="v">${esc(v)}</span></div>`).join("")}</div>
+            ${t.description ? `<div class="titre-mini" style="color: var(--mali-vert-fonce);">Précisions</div><p class="description">${esc(t.description)}</p>` : ""}
+            <div class="vendeur">
+              <div class="avatar" style="background: var(--mali-vert); color: var(--mali-jaune);">${esc((t.nomVendeur || "?").trim().charAt(0).toUpperCase())}</div>
+              <div>
+                <strong>${esc(t.nomVendeur || "Membre")}</strong>
+                <span>${estEntreprise(t.plan) ? '<span class="badge badge-ent">★ Compte Pro</span>' : "Particulier"}</span>
+              </div>
+            </div>
+            <div class="actions">
+              <div id="zoneContact" class="actions"><div class="petit">Chargement du contact…</div></div>
+              <button class="btn btn-contour btn-plein" id="btnPartager" type="button">🔗 Partager le trajet</button>
+            </div>
+            <div class="avertissement-gp" style="margin-top: 18px;">
+              <strong>⚠️ Avant de confier un colis</strong>
+              <ul>
+                <li>Ne payez jamais avant la remise du colis en main propre ; vérifiez l'identité du voyageur.</li>
+                <li>Objets refusés : médicaments sans ordonnance, espèces, contrefaçons, produits illicites, armes, produits inflammables.</li>
+                <li>Sugukura met en relation et n'est pas transporteur : chacun reste responsable du contenu et des règles de douane.</li>
+              </ul>
+            </div>
+          </div>`;
+
+        document.getElementById("btnPartager").addEventListener("click", async (e) => {
+          const bouton = e.currentTarget;
+          const texte = `GP ${t.depart} → ${t.arrivee} le ${dateFr(t.dateVoyage)} sur Sugukura`;
+          try {
+            if (navigator.share) await navigator.share({ title: texte, text: texte, url: location.href });
+            else {
+              await navigator.clipboard.writeText(location.href);
+              bouton.textContent = "✓ Lien copié";
+              setTimeout(() => (bouton.textContent = "🔗 Partager le trajet"), 2000);
+            }
+          } catch (_) { /* partage annulé */ }
+        });
+
+        surveillerContact(t, offre);
+      } catch (err) {
+        zone.className = "vide";
+        zone.innerHTML = `Erreur de chargement.<br><small>${esc(err.message)}</small>`;
+      }
+    }
+
+    // Contact : réservé aux membres connectés
+    function surveillerContact(t, offre) {
+      onAuthStateChanged(auth, async (utilisateur) => {
+        const zc = document.getElementById("zoneContact");
+        if (!zc) return;
+        if (!utilisateur) {
+          const retour = encodeURIComponent("gp-voyage.html" + location.search);
+          zc.innerHTML = `
+            <div class="contact-masque">
+              <strong>🔒 Contact ${offre ? "du voyageur" : "de l'expéditeur"}</strong>
+              <p>Connectez-vous ou créez un compte gratuit pour voir son WhatsApp et son numéro.</p>
+              <a class="btn btn-mali btn-plein" href="publier.html?retour=${retour}">Se connecter pour contacter</a>
+            </div>`;
+          return;
+        }
+        let wa = "", tel = "";
+        try {
+          const c = await getDoc(doc(db, "contactsGp", id));
+          if (c.exists()) { wa = chiffres(c.data().whatsapp); tel = chiffres(c.data().telephone); }
+        } catch (_) {}
+        const msg = encodeURIComponent(`Bonjour, je vous contacte pour votre trajet GP ${t.depart} → ${t.arrivee} du ${dateFr(t.dateVoyage)} sur Sugukura : ${location.href}`);
+        const boutons = [];
+        if (wa) boutons.push(`<a class="btn btn-wa btn-plein" target="_blank" rel="noopener" href="https://wa.me/${wa}?text=${msg}">💬 Contacter sur WhatsApp</a>`);
+        if (tel) boutons.push(`<a class="btn btn-contour btn-plein" href="tel:+${tel}">📞 Appeler</a>`);
+        zc.innerHTML = boutons.length ? boutons.join("") : `<div class="message info">Aucun numéro renseigné.</div>`;
+      });
+    }
+
+    charger();
+  </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GP Paris ⇄ Bamako — Sugukura</title>
+<meta name="description" content="Envoyez ou transportez vos colis entre la France et le Mali : trajets de voyageurs GP, gratuit pour les particuliers." />
+<link rel="icon" href="logo.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="entete"></div>
+
+  <section class="hero-gp">
+    <div class="hero-in">
+      <span class="etiquette-or">GP · Colis France ⇄ Mali</span>
+      <h1>Envoyez vos colis avec un voyageur, <em>Paris ⇄ Bamako</em></h1>
+      <p>Des voyageurs proposent leurs kilos disponibles, des expéditeurs cherchent un GP. Gratuit pour les particuliers.</p>
+    </div>
+  </section>
+  <div class="filet-mali"></div>
+
+  <main class="page">
+    <div class="conteneur">
+
+      <div class="recherche recherche-gp">
+        <div class="sens-filtre" id="filtreSens">
+          <button type="button" class="puce-sens actif" data-sens="">Tous les trajets</button>
+          <button type="button" class="puce-sens" data-sens="offre">✈️ Voyageurs (kilos disponibles)</button>
+          <button type="button" class="puce-sens" data-sens="demande">📦 Demandes d'envoi</button>
+        </div>
+        <div class="champ"><label for="fDepart">Départ</label><select id="fDepart"><option value="">Toutes villes</option></select></div>
+        <div class="champ"><label for="fArrivee">Arrivée</label><select id="fArrivee"><option value="">Toutes villes</option></select></div>
+        <div class="champ"><label for="fDate">À partir du</label><input id="fDate" type="date" /></div>
+        <div class="champ"><label for="fKg">Kilos minimum</label><input id="fKg" type="number" inputmode="numeric" min="0" placeholder="0" /></div>
+        <div class="pied-recherche" style="grid-column: 1 / -1;">
+          <span class="compteur" id="compteur" style="color: var(--mali-vert-fonce);"></span>
+          <button class="btn-lien" id="btnReset" type="button">Réinitialiser</button>
+        </div>
+      </div>
+
+      <div class="titre-section"><h2>Prochains trajets</h2></div>
+      <div id="zone" class="chargement">Chargement des trajets…</div>
+
+      <div class="avertissement-gp" style="margin-top: 26px;">
+        <strong>⚠️ Sugukura met en relation voyageurs et expéditeurs : nous ne sommes pas transporteur.</strong>
+        <ul>
+          <li>Ne payez jamais avant d'avoir remis votre colis en main propre, et vérifiez l'identité du voyageur.</li>
+          <li>Objets refusés : médicaments sans ordonnance, espèces, contrefaçons, produits illicites, armes, produits inflammables.</li>
+          <li>Le voyageur peut ouvrir et refuser tout colis. Chacun reste responsable du respect des règles de douane.</li>
+        </ul>
+      </div>
+
+      <!-- ===== Publier un trajet ===== -->
+      <div class="conteneur-etroit" style="margin-top: 34px;">
+        <div class="boite boite-gp" id="publier">
+          <h2 id="titreForm">Publier un trajet GP</h2>
+
+          <div id="gpNonConnecte" hidden>
+            <p class="petit" style="font-size: 14px;">Créez un compte gratuit ou connectez-vous pour proposer vos kilos disponibles ou chercher un GP.</p>
+            <a class="btn btn-mali" href="publier.html?retour=gp.html%23publier">Se connecter pour publier</a>
+          </div>
+          <div id="gpChargement" class="petit">Chargement…</div>
+
+          <div id="gpConnecte" hidden>
+            <div class="petit"><strong id="texteQuota"></strong></div>
+            <div class="jauge"><i id="barreQuota" style="width:0%"></i></div>
+
+            <form id="formGp" class="formulaire" style="margin-top: 16px;">
+              <div class="bandeau-edition" id="bandeauEdition" hidden>
+                <span>✏️ Modification du trajet <span id="titreEdition"></span></span>
+                <button class="btn-lien" id="btnAnnulerEdition" type="button">Annuler</button>
+              </div>
+              <div class="choix-type">
+                <label><input type="radio" name="sens" value="offre" checked /><span>✈️ Je voyage<small>J'ai des kilos disponibles</small></span></label>
+                <label><input type="radio" name="sens" value="demande" /><span>📦 Je cherche un GP<small>J'ai un colis à envoyer</small></span></label>
+              </div>
+              <div class="champ"><label for="gDepart">Ville de départ</label><select id="gDepart" required></select></div>
+              <div class="champ"><label for="gArrivee">Ville d'arrivée</label><select id="gArrivee" required></select></div>
+              <div class="champ"><label for="gDate" id="labelDate">Date du voyage</label><input id="gDate" type="date" required /></div>
+              <div class="champ" id="blocLimite"><label for="gLimite">Dépôt des colis jusqu'au (facultatif)</label><input id="gLimite" type="date" /></div>
+              <div class="champ"><label for="gKilos" id="labelKilos">Kilos disponibles</label><input id="gKilos" type="number" inputmode="decimal" min="0" step="0.5" required /></div>
+              <div class="champ">
+                <label for="gPrix" id="labelPrix">Prix par kilo (vide = à discuter)</label>
+                <div style="display:flex; gap:8px;">
+                  <input id="gPrix" type="number" inputmode="decimal" min="0" step="0.5" style="flex:1;" />
+                  <select id="gDevise" style="width: 96px;"><option value="EUR">€</option><option value="FCFA">FCFA</option></select>
+                </div>
+              </div>
+              <div class="champ col-2"><label for="gLieu">Lieu de dépôt / retrait (quartier, ville)</label><input id="gLieu" type="text" maxlength="120" placeholder="Ex. Paris 18e — Bamako, Hamdallaye ACI" /></div>
+              <div class="champ col-2"><label for="gDesc">Précisions</label><textarea id="gDesc" maxlength="1500" placeholder="Type de colis acceptés, conditions, horaires de dépôt…"></textarea></div>
+              <div class="message erreur col-2" id="msgGp" hidden></div>
+              <div class="col-2"><button class="btn btn-mali btn-plein" type="submit" id="btnPublier">Publier le trajet</button></div>
+            </form>
+
+            <h2 style="margin-top: 30px;">Mes trajets</h2>
+            <div class="mes-annonces" id="mesTrajets"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="pied"></div>
+
+  <script type="module">
+    import { auth, db, VILLES_GP, QUOTA_GP, esc, chiffres, aujourdhui, dateFr, prixKg, estEntreprise, renderEntete, renderPied } from "./commun.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import { collection, query, where, orderBy, limit, onSnapshot, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+    renderEntete("gp");
+    renderPied();
+
+    const $ = (id) => document.getElementById(id);
+    const optionsVilles = Object.entries(VILLES_GP).map(([pays, villes]) =>
+      `<optgroup label="${esc(pays)}">${villes.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join("")}</optgroup>`).join("");
+    $("fDepart").innerHTML += optionsVilles;
+    $("fArrivee").innerHTML += optionsVilles;
+    $("gDepart").innerHTML = optionsVilles;
+    $("gArrivee").innerHTML = optionsVilles;
+    $("gDepart").value = "Paris";
+    $("gArrivee").value = "Bamako";
+    $("gDate").min = aujourdhui();
+
+    function message(el, type, texte) {
+      if (!texte) { el.hidden = true; return; }
+      el.className = `message ${type} col-2`;
+      el.textContent = texte;
+      el.hidden = false;
+    }
+    const route = (t) => `${esc(t.depart)}<span class="fl">→</span>${esc(t.arrivee)}`;
+    const libelleKilos = (t) => t.kilos ? `${Number(t.kilos).toLocaleString("fr-FR")} kg ${t.sens === "offre" ? "dispo" : "à envoyer"}` : "";
+
+    // ---------- Liste publique des trajets à venir ----------
+    let trajets = [];
+    let sens = "";
+
+    function afficher() {
+      const dep = $("fDepart").value, arr = $("fArrivee").value;
+      const apartir = $("fDate").value;
+      const kgMin = $("fKg").value ? Number($("fKg").value) : null;
+      const res = trajets.filter((t) => {
+        if (sens && t.sens !== sens) return false;
+        if (dep && t.depart !== dep) return false;
+        if (arr && t.arrivee !== arr) return false;
+        if (apartir && t.dateVoyage < apartir) return false;
+        if (kgMin !== null && !(Number(t.kilos) >= kgMin)) return false;
+        return true;
+      });
+      $("compteur").textContent = `${res.length} trajet${res.length > 1 ? "s" : ""}`;
+      const zone = $("zone");
+      if (res.length === 0) {
+        zone.className = "vide";
+        zone.innerHTML = trajets.length === 0
+          ? `Aucun trajet annoncé pour le moment.<br><br><a class="btn btn-mali" href="#publier">Publier le premier trajet</a>`
+          : `Aucun trajet ne correspond à votre recherche.`;
+        return;
+      }
+      zone.className = "liste-gp";
+      zone.innerHTML = res.map((t) => {
+        const [, m, j] = t.dateVoyage.split("-");
+        const mois = new Date(2000, Number(m) - 1, 1).toLocaleDateString("fr-FR", { month: "short" });
+        return `
+          <a class="trajet ${t.sens === "demande" ? "demande" : ""}" href="gp-voyage.html?id=${encodeURIComponent(t.id)}">
+            <div class="trajet-date"><span class="j">${Number(j)}</span><span class="m">${esc(mois)}</span></div>
+            <div>
+              <div class="trajet-route">${route(t)}</div>
+              <div class="trajet-infos">
+                <span class="puce-gp ${t.sens === "demande" ? "puce-demande" : "puce-offre"}">${t.sens === "demande" ? "📦 Cherche un GP" : "✈️ Voyageur"}</span>
+                ${libelleKilos(t) ? `<span class="puce-gp">${esc(libelleKilos(t))}</span>` : ""}
+                <span class="puce-gp">${esc(prixKg(t))}</span>
+                ${estEntreprise(t.plan) ? `<span class="puce-gp" style="background:linear-gradient(135deg,#f5cf7c,var(--ocre));color:var(--brun);">★ Pro</span>` : ""}
+              </div>
+              <div class="trajet-pied">${esc(dateFr(t.dateVoyage))}${t.lieu ? " · 📍 " + esc(t.lieu) : ""} · ${esc(t.nomVendeur || "")}</div>
+            </div>
+          </a>`;
+      }).join("");
+    }
+
+    document.querySelectorAll(".puce-sens").forEach((b) => b.addEventListener("click", () => {
+      sens = b.dataset.sens;
+      document.querySelectorAll(".puce-sens").forEach((x) => x.classList.toggle("actif", x === b));
+      afficher();
+    }));
+    ["fDepart", "fArrivee", "fDate", "fKg"].forEach((id) => {
+      $(id).addEventListener("input", afficher);
+      $(id).addEventListener("change", afficher);
+    });
+    $("btnReset").addEventListener("click", () => {
+      $("fDepart").value = ""; $("fArrivee").value = ""; $("fDate").value = ""; $("fKg").value = "";
+      sens = ""; document.querySelectorAll(".puce-sens").forEach((x, i) => x.classList.toggle("actif", i === 0));
+      afficher();
+    });
+
+    // Seuls les trajets d'aujourd'hui ou à venir sont affichés (les voyages passés disparaissent seuls)
+    onSnapshot(
+      query(collection(db, "gp"), where("dateVoyage", ">=", aujourdhui()), orderBy("dateVoyage"), limit(200)),
+      (snap) => { trajets = snap.docs.map((d) => ({ id: d.id, ...d.data() })); afficher(); },
+      (err) => { $("zone").className = "vide"; $("zone").innerHTML = `Impossible de charger les trajets.<br><small>${esc(err.message)}</small>`; }
+    );
+
+    // ---------- Espace membre : publier / modifier / supprimer ----------
+    let profil = null;
+    let mesTrajets = [];
+    let stopMes = null;
+    let edition = null;
+
+    const aVenir = (t) => t.dateVoyage >= aujourdhui();
+    const quota = () => (estEntreprise(profil?.plan) ? Number(profil.quota) : QUOTA_GP);
+
+    function majSens() {
+      const s = document.querySelector('input[name="sens"]:checked').value;
+      $("labelKilos").textContent = s === "offre" ? "Kilos disponibles" : "Poids du colis (kg)";
+      $("labelDate").textContent = s === "offre" ? "Date du voyage" : "Date souhaitée (au plus tard)";
+      $("labelPrix").textContent = s === "offre" ? "Prix par kilo (vide = à discuter)" : "Budget par kilo (vide = à discuter)";
+      $("blocLimite").hidden = s !== "offre";
+    }
+    document.querySelectorAll('input[name="sens"]').forEach((r) => r.addEventListener("change", majSens));
+
+    onAuthStateChanged(auth, async (utilisateur) => {
+      if (stopMes) stopMes();
+      profil = null; mesTrajets = []; quitterEdition();
+      $("gpChargement").hidden = true;
+      if (!utilisateur) { $("gpNonConnecte").hidden = false; $("gpConnecte").hidden = true; return; }
+      try {
+        const snap = await getDoc(doc(db, "users", utilisateur.uid));
+        if (!snap.exists()) { location.href = "publier.html?retour=gp.html%23publier"; return; }
+        profil = snap.data();
+      } catch (err) {
+        $("gpChargement").hidden = false;
+        $("gpChargement").textContent = "Erreur de chargement du profil : " + err.message;
+        return;
+      }
+      $("gpNonConnecte").hidden = true;
+      $("gpConnecte").hidden = false;
+      if (location.hash === "#publier") setTimeout(() => $("publier").scrollIntoView({ behavior: "smooth" }), 200);
+      stopMes = onSnapshot(query(collection(db, "gp"), where("uid", "==", utilisateur.uid)), (snap) => {
+        mesTrajets = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.dateVoyage < b.dateVoyage ? 1 : -1));
+        dessinerMesTrajets();
+      });
+    });
+
+    function dessinerQuota() {
+      const n = mesTrajets.filter(aVenir).length, max = quota();
+      $("texteQuota").textContent = `${n} / ${max} trajet${max > 1 ? "s" : ""} à venir`;
+      $("barreQuota").style.width = Math.min(100, Math.round((n / max) * 100)) + "%";
+    }
+
+    function dessinerMesTrajets() {
+      dessinerQuota();
+      const zone = $("mesTrajets");
+      if (mesTrajets.length === 0) { zone.innerHTML = `<div class="petit">Aucun trajet publié pour le moment.</div>`; return; }
+      zone.innerHTML = mesTrajets.map((t) => `
+        <div class="mon-annonce" style="${aVenir(t) ? "" : "opacity:.6;"}">
+          <div class="mini-vide" style="background: var(--mali-vert-pale);">${t.sens === "demande" ? "📦" : "✈️"}</div>
+          <div class="corps">
+            <strong>${esc(t.depart)} → ${esc(t.arrivee)}</strong>
+            <span>${esc(dateFr(t.dateVoyage))} · ${esc(libelleKilos(t))}${aVenir(t) ? "" : " · terminé (masqué)"}</span>
+          </div>
+          <div class="btns">
+            <a class="btn btn-contour btn-petit" href="gp-voyage.html?id=${encodeURIComponent(t.id)}">Voir</a>
+            <button class="btn btn-contour btn-petit btn-modifier" data-id="${esc(t.id)}" type="button">Modifier</button>
+            <button class="btn btn-petit btn-danger btn-supprimer" data-id="${esc(t.id)}" type="button">Supprimer</button>
+          </div>
+        </div>`).join("");
+      zone.querySelectorAll(".btn-modifier").forEach((b) => b.addEventListener("click", () => commencerEdition(b.dataset.id)));
+      zone.querySelectorAll(".btn-supprimer").forEach((b) => b.addEventListener("click", () => supprimer(b.dataset.id)));
+    }
+
+    async function supprimer(id) {
+      if (!confirm("Supprimer ce trajet ?")) return;
+      try {
+        try { await deleteDoc(doc(db, "contactsGp", id)); } catch (_) {}
+        await deleteDoc(doc(db, "gp", id));
+        if (edition && edition.id === id) quitterEdition();
+      } catch (err) { alert("Suppression impossible : " + err.message); }
+    }
+
+    function commencerEdition(id) {
+      const t = mesTrajets.find((x) => x.id === id);
+      if (!t) return;
+      edition = t;
+      document.querySelector(`input[name="sens"][value="${t.sens === "demande" ? "demande" : "offre"}"]`).checked = true;
+      majSens();
+      $("gDepart").value = t.depart; $("gArrivee").value = t.arrivee;
+      $("gDate").value = t.dateVoyage; $("gLimite").value = t.dateLimite || "";
+      $("gKilos").value = t.kilos ?? ""; $("gPrix").value = t.prixKg ?? "";
+      $("gDevise").value = t.devise === "FCFA" ? "FCFA" : "EUR";
+      $("gLieu").value = t.lieu || ""; $("gDesc").value = t.description || "";
+      $("titreForm").textContent = "Modifier le trajet";
+      $("titreEdition").textContent = `${t.depart} → ${t.arrivee}`;
+      $("bandeauEdition").hidden = false;
+      $("btnPublier").textContent = "Enregistrer les modifications";
+      message($("msgGp"), "erreur", "");
+      $("publier").scrollIntoView({ behavior: "smooth" });
+    }
+    function quitterEdition() {
+      edition = null;
+      $("formGp").reset();
+      $("gDepart").value = "Paris"; $("gArrivee").value = "Bamako";
+      majSens();
+      $("titreForm").textContent = "Publier un trajet GP";
+      $("bandeauEdition").hidden = true;
+      $("btnPublier").textContent = "Publier le trajet";
+    }
+    $("btnAnnulerEdition").addEventListener("click", () => { quitterEdition(); message($("msgGp"), "erreur", ""); });
+
+    $("formGp").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = $("msgGp");
+      message(msg, "erreur", "");
+      const utilisateur = auth.currentUser;
+      if (!utilisateur || !profil) return;
+      const s = document.querySelector('input[name="sens"]:checked').value;
+      const depart = $("gDepart").value, arrivee = $("gArrivee").value, dateVoyage = $("gDate").value;
+      if (depart === arrivee) return message(msg, "erreur", "Les villes de départ et d'arrivée doivent être différentes.");
+      if (!dateVoyage || dateVoyage < aujourdhui()) return message(msg, "erreur", "Choisissez une date à venir.");
+      const limite = s === "offre" ? $("gLimite").value : "";
+      if (limite && limite > dateVoyage) return message(msg, "erreur", "La date limite de dépôt doit être avant le voyage.");
+      const kilos = Number($("gKilos").value);
+      if (!(kilos > 0)) return message(msg, "erreur", "Indiquez un nombre de kilos.");
+      if (!edition && mesTrajets.filter(aVenir).length >= quota()) {
+        return message(msg, "erreur", `Limite atteinte (${quota()} trajets à venir). Supprimez un trajet ou passez en compte Pro.`);
+      }
+      const donnees = {
+        sens: s, depart, arrivee, dateVoyage, dateLimite: limite || null,
+        kilos, prixKg: $("gPrix").value === "" ? null : Number($("gPrix").value),
+        devise: $("gDevise").value,
+        lieu: $("gLieu").value.trim().slice(0, 120),
+        description: $("gDesc").value.trim().slice(0, 1500),
+        nomVendeur: profil.nom, plan: profil.plan, compteType: profil.typeCompte,
+      };
+      $("btnPublier").disabled = true;
+      try {
+        let id;
+        if (edition) {
+          id = edition.id;
+          await updateDoc(doc(db, "gp", id), { ...donnees, modifieLe: serverTimestamp() });
+        } else {
+          id = (await addDoc(collection(db, "gp"), { uid: utilisateur.uid, ...donnees, creeLe: serverTimestamp() })).id;
+        }
+        // Coordonnées rangées à part : visibles seulement des membres connectés
+        await setDoc(doc(db, "contactsGp", id), {
+          uid: utilisateur.uid,
+          whatsapp: chiffres(profil.whatsapp || profil.telephone),
+          telephone: chiffres(profil.telephone || profil.whatsapp),
+        });
+        const etaitEdition = Boolean(edition);
+        quitterEdition();
+        message(msg, "ok", etaitEdition ? "✓ Trajet modifié." : "✓ Trajet publié ! Il est visible dans la liste des trajets.");
+      } catch (err) {
+        message(msg, "erreur", "Enregistrement impossible : " + err.message);
+      }
+      $("btnPublier").disabled = false;
+    });
+  </script>
+</body>
+</html>

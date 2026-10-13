@@ -254,3 +254,88 @@ img { max-width: 100%; }
   .formulaire .col-2, .choix-type, .message, .apercu-photos { grid-column: span 1; }
   .panneau h1 { font-size: 24px; }
 }
+
+/* ============================================================
+   RUBRIQUE GP — vert et jaune du Mali, en accents sobres
+   ============================================================ */
+:root {
+  --mali-vert: #0e7a3b;
+  --mali-vert-fonce: #0a5a2c;
+  --mali-vert-pale: #eaf5ee;
+  --mali-jaune: #fcd116;
+  --mali-jaune-pale: #fff8d6;
+}
+.nav-gp { color: #fff; }
+.nav-gp.actif { background: var(--mali-vert); }
+.filet-mali { height: 4px; background: linear-gradient(90deg, var(--mali-vert) 0 50%, var(--mali-jaune) 50% 100%); }
+
+.hero-gp { position: relative; overflow: hidden; color: #fff; padding: 42px 18px 92px;
+  background: linear-gradient(135deg, var(--mali-vert-fonce) 0%, var(--mali-vert) 100%); }
+.hero-gp::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background-image: repeating-linear-gradient(45deg, transparent 0 22px, rgba(252,209,22,.08) 22px 23px); }
+.hero-gp .hero-in { position: relative; z-index: 1; }
+.hero-gp .etiquette-or { color: var(--mali-jaune); }
+.hero-gp .etiquette-or::before { background: var(--mali-jaune); }
+.hero-gp h1 { font-family: var(--serif); margin: 12px 0 10px; font-size: clamp(28px, 5.5vw, 46px); line-height: 1.1; max-width: 720px; }
+.hero-gp h1 em { font-style: normal; color: var(--mali-jaune); }
+.hero-gp p { margin: 0; max-width: 560px; color: #d6eedd; font-size: 15px; }
+
+.recherche-gp::before { background: linear-gradient(90deg, var(--mali-vert), var(--mali-jaune)); }
+.sens-filtre { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.puce-sens { border: 1.5px solid var(--bordure); background: #fff; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13px; font-weight: 700; color: var(--brun); cursor: pointer; }
+.puce-sens.actif { background: var(--mali-vert); border-color: var(--mali-vert); color: #fff; }
+
+.liste-gp { display: grid; gap: 14px; }
+.trajet { display: grid; grid-template-columns: 74px 1fr; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--bordure); border-left: 5px solid var(--mali-vert); border-radius: 16px; padding: 16px; text-decoration: none; color: inherit; box-shadow: var(--ombre); transition: transform .15s, box-shadow .15s; }
+.trajet.demande { border-left-color: var(--mali-jaune); }
+.trajet:hover { transform: translateY(-3px); box-shadow: var(--ombre-forte); }
+.trajet-date { text-align: center; background: var(--mali-vert-pale); border-radius: 12px; padding: 8px 4px; color: var(--mali-vert-fonce); line-height: 1.1; }
+.trajet.demande .trajet-date { background: var(--mali-jaune-pale); color: #6b5300; }
+.trajet-date .j { display: block; font-size: 24px; font-weight: 800; }
+.trajet-date .m { display: block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.trajet-route { font-family: var(--serif); font-size: 19px; font-weight: 700; color: var(--brun); }
+.trajet-route .fl { color: var(--mali-vert); margin: 0 6px; }
+.trajet-infos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.puce-gp { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 8px; background: var(--sable-2); color: #5d4c3c; }
+.puce-offre { background: var(--mali-vert-pale); color: var(--mali-vert-fonce); }
+.puce-demande { background: var(--mali-jaune-pale); color: #6b5300; }
+.trajet-pied { margin-top: 8px; font-size: 12px; color: var(--doux); }
+
+.btn-mali { color: #fff; background: var(--mali-vert); box-shadow: 0 6px 16px rgba(14,122,59,.28); }
+.btn-mali:hover { background: var(--mali-vert-fonce); }
+.boite-gp h2::after { background: linear-gradient(90deg, var(--mali-vert) 0 50%, var(--mali-jaune) 50% 100%); }
+.boite-gp .choix-type label:has(input:checked) { border-color: var(--mali-vert); background: var(--mali-vert-pale); }
+.boite-gp .choix-type input:checked + span { color: var(--mali-vert-fonce); }
+.boite-gp .jauge i { background: var(--mali-vert); }
+
+.avertissement-gp { border: 1px solid #ecd98a; background: var(--mali-jaune-pale); color: #5c4800; border-radius: 14px; padding: 14px 16px; font-size: 13px; }
+.avertissement-gp strong { display: block; margin-bottom: 4px; color: #4a3a00; }
+.avertissement-gp ul { margin: 6px 0 0; padding-left: 18px; }
+
+.route-detail { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--brun); line-height: 1.15; margin: 10px 0 4px; }
+.route-detail .fl { color: var(--mali-vert); }
+.badge-offre { color: #fff; background: var(--mali-vert); }
+.badge-demande { color: #4a3a00; background: var(--mali-jaune); }
+
+/* Encart GP sur l'accueil */
+.encart-gp { margin-top: 30px; display: grid; gap: 16px; align-items: center; border-radius: 22px; padding: 26px; color: #fff; text-decoration: none; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--mali-vert-fonce), var(--mali-vert)); box-shadow: var(--ombre-forte); }
+.encart-gp::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: var(--mali-jaune); }
+.encart-gp .eti { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--mali-jaune); }
+.encart-gp h2 { font-family: var(--serif); font-size: 25px; margin: 6px 0; }
+.encart-gp p { margin: 0; color: #d6eedd; font-size: 14px; max-width: 520px; }
+.encart-gp .btn { background: var(--mali-jaune); color: #2b2300; justify-self: start; }
+@media (min-width: 760px) { .encart-gp { grid-template-columns: 1fr auto; padding: 30px 34px; } }
+@media (max-width: 520px) { .trajet { grid-template-columns: 62px 1fr; gap: 12px; } .trajet-route { font-size: 17px; } .route-detail { font-size: 25px; } }
+
+/* Entête compacte sur téléphone */
+.nav a { white-space: nowrap; }
+@media (max-width: 520px) {
+  .entete-in { padding: 10px 12px; gap: 8px; }
+  .logo { gap: 8px; }
+  .logo-nom { font-size: 18px; }
+  .nav { gap: 2px; }
+  .nav-lien { padding: 8px 8px; font-size: 13px; }
+  .nav .btn-petit { padding: 8px 10px; font-size: 13px; }
+}
+@media (max-width: 380px) { .logo-nom { display: none; } }

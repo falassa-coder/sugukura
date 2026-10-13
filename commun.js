@@ -29,6 +29,30 @@ export const CONTACT_EMAIL = "falassaservices@gmail.com";
 export const QUOTA_GRATUIT = 3; // annonces actives pour un compte gratuit
 export const MAX_PHOTOS = 5;
 
+// Rubrique GP (envoi de colis par des voyageurs) : villes de départ / arrivée
+export const VILLES_GP = {
+  "France": ["Paris", "Lyon", "Marseille", "Lille", "Bordeaux", "Toulouse", "Nantes", "Strasbourg", "Autre (France)"],
+  "Mali": ["Bamako", "Kayes", "Sikasso", "Ségou", "Mopti", "Koulikoro", "Autre (Mali)"],
+};
+export const QUOTA_GP = 3; // trajets à venir pour un compte gratuit
+
+// Date du jour au format AAAA-MM-JJ (heure locale)
+export function aujourdhui() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+// « 2026-10-21 » → « mar. 21 oct. 2026 »
+export function dateFr(iso, avecAnnee = true) {
+  if (!iso) return "";
+  const [a, m, j] = iso.split("-").map(Number);
+  return new Date(a, m - 1, j).toLocaleDateString("fr-FR",
+    { weekday: "short", day: "numeric", month: "short", ...(avecAnnee ? { year: "numeric" } : {}) });
+}
+export function prixKg(v) {
+  if (v.prixKg === null || v.prixKg === undefined || v.prixKg === "") return "Prix à discuter";
+  return Number(v.prixKg).toLocaleString("fr-FR") + (v.devise === "FCFA" ? " FCFA" : " €") + " / kg";
+}
+
 export const VILLES = ["Bamako", "Kayes", "Koulikoro", "Sikasso", "Ségou", "Mopti", "Gao", "Tombouctou", "Kidal", "Autre"];
 
 // ------------------------------------------------------------
@@ -152,6 +176,7 @@ export function renderEntete(actif) {
         </a>
         <nav class="nav">
           <a class="nav-lien cache-mobile ${actif === "annonces" ? "actif" : ""}" href="index.html">Annonces</a>
+          <a class="nav-lien nav-gp ${actif === "gp" ? "actif" : ""}" href="gp.html">✈️ GP</a>
           <a class="nav-lien ${actif === "compte" ? "actif" : ""}" id="lienCompte" href="publier.html">Connexion</a>
           <a class="btn btn-terre btn-petit" href="publier.html#publier">+ Déposer</a>
         </nav>
@@ -179,6 +204,7 @@ export function renderPied() {
           <span class="pied-titre">Le site</span>
           <a href="index.html">Annonces</a>
           <a href="publier.html">Déposer une annonce</a>
+          <a href="gp.html">GP Paris ⇄ Bamako</a>
           <a href="${lienPro}" target="_blank" rel="noopener">Publicité &amp; comptes Pros</a>
         </div>
         <div class="pied-liens">

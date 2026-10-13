@@ -138,7 +138,7 @@
              esc, chiffres, formatPrix, ilYa, estEntreprise, categorieDe, renderEntete, renderPied } from "./commun.js";
     import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-    import { doc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, serverTimestamp }
+    import { doc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, getDocs, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
     import { ref, uploadBytes, getDownloadURL, deleteObject }
       from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
@@ -151,7 +151,7 @@
 
     // Retour vers une annonce après connexion (lien « Se connecter pour contacter »)
     const retour = new URLSearchParams(location.search).get("retour");
-    const retourValide = retour && /^annonce\.html\?id=[\w-]+$/.test(retour) ? retour : null;
+    const retourValide = retour && /^(annonce\.html\?id=[\w-]+|gp\.html(#publier)?|gp-voyage\.html\?id=[\w-]+)$/.test(retour) ? retour : null;
     let etaitDeconnecte = false;
 
     function montrer(nom) {
@@ -367,6 +367,13 @@
         profil = { ...profil, whatsapp: wa, telephone: tel };
         // Les annonces déjà en ligne prennent les nouveaux numéros
         for (const a of mesAnnonces) { try { await enregistrerContact(a.id); } catch (_) {} }
+        // … ainsi que les trajets GP
+        try {
+          const gp = await getDocs(query(collection(db, "gp"), where("uid", "==", auth.currentUser.uid)));
+          for (const t of gp.docs) {
+            try { await setDoc(doc(db, "contactsGp", t.id), { uid: auth.currentUser.uid, whatsapp: wa, telephone: tel }); } catch (_) {}
+          }
+        } catch (_) {}
         $("formCoordonnees").hidden = true;
         $("blocCoordonnees").hidden = false;
         dessinerCompte();
